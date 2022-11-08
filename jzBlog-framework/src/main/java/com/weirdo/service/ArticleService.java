@@ -2,6 +2,7 @@ package com.weirdo.service;
 
 
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.weirdo.domain.ResponseResult;
 import com.weirdo.domain.entity.Article;
 
 /**
@@ -12,5 +13,6 @@ import com.weirdo.domain.entity.Article;
  */
 public interface ArticleService extends IService<Article> {
 
+    ResponseResult hotArticleList();
 }
 

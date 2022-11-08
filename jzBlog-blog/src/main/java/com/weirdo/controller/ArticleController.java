@@ -3,12 +3,11 @@ package com.weirdo.controller;
 
 
 
-import com.weirdo.domain.entity.Article;
+import com.weirdo.domain.ResponseResult;
 import com.weirdo.service.ArticleService;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
-import java.util.List;
 
 /**
  * 文章表(Article)表控制层
@@ -25,9 +24,13 @@ public class ArticleController{
     @Resource
     private ArticleService articleService;
 
-    @RequestMapping("/test")
-    public List<Article> test(){
-        return articleService.list();
+    /**
+     * 查询热度前10文章
+     * @return
+     */
+    @GetMapping("/hotArticleList")
+    public ResponseResult hotArticleList(){
+        return articleService.hotArticleList();
     }
 
 }
