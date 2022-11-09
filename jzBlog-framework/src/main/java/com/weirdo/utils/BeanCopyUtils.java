@@ -43,7 +43,7 @@ public class BeanCopyUtils {
      * @param <V>
      * @return
      */
-    public static <K,V> List<K> BeanList(List<V> list,Class<K> clazz){
+    public static <K,V> List<K> copyBeanList(List<V> list,Class<K> clazz){
         return list.stream().map(o->copyBean(o,clazz)).collect(Collectors.toList());
     }
 }
