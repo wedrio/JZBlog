@@ -3,6 +3,7 @@ package com.weirdo.controller;
 
 
 
+import com.weirdo.domain.ResponseResult;
 import com.weirdo.service.LinkService;
 import org.springframework.web.bind.annotation.*;
 
@@ -23,5 +24,13 @@ public class LinkController  {
     @Resource
     private LinkService linkService;
 
+    /**
+     * 获取所有友链
+     * @return
+     */
+    @GetMapping("/getAllLink")
+    public ResponseResult getAllLink(){
+        return linkService.getAllLink();
     }
+}
 

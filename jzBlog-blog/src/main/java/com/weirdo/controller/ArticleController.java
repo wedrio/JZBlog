@@ -8,6 +8,7 @@ import com.weirdo.service.ArticleService;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import javax.websocket.server.PathParam;
 
 /**
  * 文章表(Article)表控制层
@@ -36,6 +37,11 @@ public class ArticleController{
     @GetMapping("/articleList")
     public ResponseResult articleList(Integer pageNum,Integer pageSize,Long categoryId){
         return articleService.articleList(pageNum,pageSize,categoryId);
+    }
+
+    @GetMapping("/{id}")
+    public ResponseResult getArticleDetail(@PathVariable("id") Long articleId){
+        return articleService.getArticleDetail(articleId);
     }
 
 }

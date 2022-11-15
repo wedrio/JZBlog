@@ -7,6 +7,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.weirdo.constants.SystemConstants;
 import com.weirdo.domain.ResponseResult;
 import com.weirdo.domain.entity.Article;
+import com.weirdo.domain.vo.ArticleDetailVo;
 import com.weirdo.domain.vo.ArticleListVo;
 import com.weirdo.domain.vo.HotArticleListVo;
 import com.weirdo.domain.vo.PageVo;
@@ -19,7 +20,6 @@ import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
 import java.util.List;
 import java.util.Objects;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
@@ -75,6 +75,17 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
 
         List<ArticleListVo> articleListVos = BeanCopyUtils.copyBeanList(articleList, ArticleListVo.class);
         return ResponseResult.okResult(new PageVo(articleListVos,page.getTotal()));
+    }
+
+    @Override
+    public ResponseResult getArticleDetail(Long articleId) {
+        //通过id查询到文章
+        Article article = getById(articleId);
+        //获取到对应的分类名称
+        String categoryName = categoryService.getById(article.getCategoryId()).getName();
+        article.setCategoryName(categoryName);
+        ArticleDetailVo articleDetailVo = BeanCopyUtils.copyBean(article, ArticleDetailVo.class);
+        return ResponseResult.okResult(articleDetailVo);
     }
 }
 

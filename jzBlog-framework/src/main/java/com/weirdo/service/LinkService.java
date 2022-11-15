@@ -1,6 +1,7 @@
 package com.weirdo.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.weirdo.domain.ResponseResult;
 import com.weirdo.domain.entity.Link;
 
 /**
@@ -11,5 +12,6 @@ import com.weirdo.domain.entity.Link;
  */
 public interface LinkService extends IService<Link> {
 
+    ResponseResult getAllLink();
 }
 
