@@ -24,5 +24,9 @@ public class SystemConstants {
      * 友链审核通过
      */
     public static final String LINK_NORMAN = "0";
+    /**
+     * 根评论
+     */
+    public static final int ROOT_COMMENT = -1;
 
 }

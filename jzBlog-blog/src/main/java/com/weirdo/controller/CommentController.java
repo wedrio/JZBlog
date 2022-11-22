@@ -3,6 +3,7 @@ package com.weirdo.controller;
 
 
 
+import com.weirdo.domain.ResponseResult;
 import com.weirdo.service.CommentService;
 import org.springframework.web.bind.annotation.*;
 
@@ -23,6 +24,18 @@ public class CommentController  {
      */
     @Resource
     private CommentService commentService;
+
+    /**
+     * 查询某个文章下的评论列表
+     * @param articleId
+     * @param pageNum
+     * @param pageSize
+     * @return
+     */
+    @GetMapping("/commentList")
+    public ResponseResult getCommentList(Long articleId,Integer pageNum,Integer pageSize){
+        return commentService.getCommentList(articleId,pageNum,pageSize);
+    }
 
     }
 
