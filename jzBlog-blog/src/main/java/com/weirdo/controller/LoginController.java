@@ -18,11 +18,20 @@ public class LoginController {
     @Autowired
     private UserService userService;
 
+    /**
+     * 登录
+     * @param user
+     * @return
+     */
     @PostMapping("/login")
     public ResponseResult login(@RequestBody User user){
         return userService.login(user);
     }
 
+    /**
+     * 退出
+     * @return
+     */
     @PostMapping("/logout")
     public ResponseResult logout(){
         return userService.logout();

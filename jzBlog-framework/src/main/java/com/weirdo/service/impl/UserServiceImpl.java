@@ -11,6 +11,7 @@ import com.weirdo.service.UserService;
 import com.weirdo.utils.BeanCopyUtils;
 import com.weirdo.utils.JwtUtil;
 import com.weirdo.utils.RedisCache;
+import com.weirdo.utils.SecurityUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -63,5 +64,16 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         //去redis中删除key
         redisCache.deleteObject("login:" + userid);
         return ResponseResult.okResult();
+    }
+
+    @Override
+    public ResponseResult userInfo() {
+        //获取当前用户id
+        Long userId = SecurityUtils.getUserId();
+        //根据用户id查询用户信息
+        User user = getById(userId);
+        //封装成userInfoVo
+        UserInfoVo vo = BeanCopyUtils.copyBean(user, UserInfoVo.class);
+        return ResponseResult.okResult(vo);
     }
 }

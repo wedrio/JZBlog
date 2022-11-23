@@ -8,6 +8,8 @@ import com.weirdo.domain.ResponseResult;
 import com.weirdo.domain.entity.User;
 import com.weirdo.domain.vo.CommentListVo;
 import com.weirdo.domain.vo.PageVo;
+import com.weirdo.enums.AppHttpCodeEnum;
+import com.weirdo.exception.SystemException;
 import com.weirdo.mapper.CommentMapper;
 import com.weirdo.domain.entity.Comment;
 import com.weirdo.service.CommentService;
@@ -15,6 +17,7 @@ import com.weirdo.service.UserService;
 import com.weirdo.utils.BeanCopyUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import java.util.List;
 
@@ -37,6 +40,8 @@ public class CommentServiceImpl extends ServiceImpl<CommentMapper, Comment> impl
         //查询文章的条件
         queryWrapper.eq(Comment::getArticleId,articleId);
         queryWrapper.eq(Comment::getRootId, SystemConstants.ROOT_COMMENT);
+        queryWrapper.eq(Comment::getType,SystemConstants.ARTICLE_COMMENT);
+
         //分页对象
         Page<Comment> page = new Page<>(pageNum, pageSize);
         page(page, queryWrapper);
@@ -50,7 +55,7 @@ public class CommentServiceImpl extends ServiceImpl<CommentMapper, Comment> impl
             List<CommentListVo> children = getChildren(listVo.getId());
             listVo.setChildren(children);
         }
-        PageVo vo = new PageVo(commentListVos,commentListVos.stream().count());
+        PageVo vo = new PageVo(commentListVos,page.getTotal());
         return ResponseResult.okResult(vo);
     }
 
@@ -63,6 +68,39 @@ public class CommentServiceImpl extends ServiceImpl<CommentMapper, Comment> impl
         List<Comment> commentList = list(queryWrapper);
         List<CommentListVo> commentListVos = toCommentVoList(commentList);
         return commentListVos;
+    }
+
+    @Override
+    public ResponseResult addComment(Comment comment) {
+        //校验评论内容不能为空
+        if (!StringUtils.hasText(comment.getContent())){
+            throw new SystemException(AppHttpCodeEnum.COMMENT_NOT_NULL);
+        }
+        save(comment);
+        return ResponseResult.okResult();
+    }
+
+    @Override
+    public ResponseResult getLinkComment(Integer pageNum, Integer pageSize) {
+        LambdaQueryWrapper<Comment> queryWrapper = new LambdaQueryWrapper<>();
+
+        queryWrapper.eq(Comment::getRootId, SystemConstants.ROOT_COMMENT);
+        queryWrapper.eq(Comment::getType,SystemConstants.LINK_COMMENT);
+
+        //分页对象
+        Page<Comment> page = new Page<>(pageNum, pageSize);
+        page(page, queryWrapper);
+        //获取查询的记录
+        List<Comment> commentList = page.getRecords();
+        List<CommentListVo> commentListVos = toCommentVoList(commentList);
+        //查询所有根评论对应的子评论集合，并且赋值给对应的属性
+
+        for (CommentListVo listVo : commentListVos) {
+            List<CommentListVo> children = getChildren(listVo.getId());
+            listVo.setChildren(children);
+        }
+        PageVo vo = new PageVo(commentListVos,page.getTotal());
+        return ResponseResult.okResult(vo);
     }
 
 

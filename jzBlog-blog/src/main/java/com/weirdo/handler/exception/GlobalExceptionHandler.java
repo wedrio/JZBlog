@@ -1,4 +1,4 @@
-package com.weirdo.handler;
+package com.weirdo.handler.exception;
 
 import com.weirdo.domain.ResponseResult;
 import com.weirdo.enums.AppHttpCodeEnum;

@@ -18,5 +18,9 @@ public interface CommentService extends IService<Comment> {
     ResponseResult getCommentList(Long articleId, Integer pageNum, Integer pageSize);
 
     List<CommentListVo> getChildren(Long id);
+
+    ResponseResult addComment(Comment comment);
+
+    ResponseResult getLinkComment(Integer pageNum, Integer pageSize);
 }
 
