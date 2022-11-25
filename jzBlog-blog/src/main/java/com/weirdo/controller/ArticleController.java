@@ -43,6 +43,9 @@ public class ArticleController{
     public ResponseResult getArticleDetail(@PathVariable("id") Long articleId){
         return articleService.getArticleDetail(articleId);
     }
-
+    @PutMapping("/updateViewCount/{id}")
+    public ResponseResult updateViewCount(@PathVariable("id") Long articleId){
+        return articleService.updateViewCount(articleId);
+    }
 }
 

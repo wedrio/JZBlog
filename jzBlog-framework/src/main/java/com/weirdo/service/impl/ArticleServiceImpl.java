@@ -15,10 +15,13 @@ import com.weirdo.mapper.ArticleMapper;
 import com.weirdo.service.ArticleService;
 import com.weirdo.service.CategoryService;
 import com.weirdo.utils.BeanCopyUtils;
+import com.weirdo.utils.RedisCache;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
@@ -32,6 +35,8 @@ import java.util.stream.Collectors;
 public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> implements ArticleService {
     @Resource
     private CategoryService categoryService;
+    @Autowired
+    private RedisCache redisCache;
 
     @Override
     public ResponseResult hotArticleList() {
@@ -72,8 +77,8 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
         //stream流分类id
         articleList.stream().map(article -> article.setCategoryName(categoryService.getById(article.getCategoryId()).getName())).collect(Collectors.toList());
 
-
         List<ArticleListVo> articleListVos = BeanCopyUtils.copyBeanList(articleList, ArticleListVo.class);
+
         return ResponseResult.okResult(new PageVo(articleListVos,page.getTotal()));
     }
 
@@ -84,8 +89,19 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
         //获取到对应的分类名称
         String categoryName = categoryService.getById(article.getCategoryId()).getName();
         article.setCategoryName(categoryName);
+        //浏览量从redis查询
+        Map<String, Integer> viewCountMap = redisCache.getCacheMap("article:viewCount");
+        Long viewCount = viewCountMap.get(articleId.toString()).longValue();
+        article.setViewCount(viewCount);
         ArticleDetailVo articleDetailVo = BeanCopyUtils.copyBean(article, ArticleDetailVo.class);
         return ResponseResult.okResult(articleDetailVo);
+    }
+
+    @Override
+    public ResponseResult updateViewCount(Long articleId) {
+        //每次新增都是更新redis中的数据
+        redisCache.incrementCacheMapValue("article:viewCount",articleId.toString(),1);
+        return ResponseResult.okResult();
     }
 }
 

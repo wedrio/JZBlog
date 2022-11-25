@@ -235,4 +235,14 @@ public class RedisCache
     {
         return redisTemplate.keys(pattern);
     }
+
+    /**
+     * 增加浏览量
+     * @param key redis的key
+     * @param hkey redis中存的map的key
+     * @param v 增加的量
+     */
+    public void incrementCacheMapValue(String key,String hkey,long v){
+        redisTemplate.boundHashOps(key).increment(hkey,v);
+    }
 }

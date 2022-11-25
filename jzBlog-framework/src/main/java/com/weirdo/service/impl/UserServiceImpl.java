@@ -1,11 +1,15 @@
 package com.weirdo.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.weirdo.domain.ResponseResult;
 import com.weirdo.domain.entity.LoginUser;
 import com.weirdo.domain.entity.User;
 import com.weirdo.domain.vo.LoginUserVo;
 import com.weirdo.domain.vo.UserInfoVo;
+import com.weirdo.enums.AppHttpCodeEnum;
+import com.weirdo.exception.SystemException;
 import com.weirdo.mapper.UserMapper;
 import com.weirdo.service.UserService;
 import com.weirdo.utils.BeanCopyUtils;
@@ -17,7 +21,9 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import java.util.Objects;
 
@@ -31,6 +37,9 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
 
     @Autowired
     private AuthenticationManager authenticationManager;
+
+    @Autowired
+    private BCryptPasswordEncoder passwordEncoder;
 
     @Autowired
     private RedisCache redisCache;
@@ -75,5 +84,77 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         //封装成userInfoVo
         UserInfoVo vo = BeanCopyUtils.copyBean(user, UserInfoVo.class);
         return ResponseResult.okResult(vo);
+    }
+
+    @Override
+    public ResponseResult updateUserInfo(User user) {
+        updateById(user);
+        return ResponseResult.okResult();
+    }
+
+    @Override
+    public ResponseResult register(User user) {
+        //对数据进行校验
+        if (!StringUtils.hasText(user.getUserName())){
+            throw new SystemException(AppHttpCodeEnum.REQUIRE_USERNAME);
+        }
+        if (!StringUtils.hasText(user.getPassword())){
+            throw new SystemException(AppHttpCodeEnum.REQUIRE_PASSWORD);
+        }
+        if (!StringUtils.hasText(user.getNickName())){
+            throw new SystemException(AppHttpCodeEnum.REQUIRE_NICKNAME);
+        }
+        if (!StringUtils.hasText(user.getEmail())){
+            throw new SystemException(AppHttpCodeEnum.REQUIRE_EMAIL);
+        }
+        //排查数据是否在数据库中有重复
+        if (userNameExist(user.getUserName())){
+            throw new SystemException(AppHttpCodeEnum.USERNAME_EXIST);
+        }
+        if (nickNameExist(user.getNickName())){
+            throw new SystemException(AppHttpCodeEnum.NICKNAME_EXIST);
+        }
+        if (emailExist(user.getEmail())){
+            throw new SystemException(AppHttpCodeEnum.EMAIL_EXIST);
+        }
+        //对密码进行加密
+        String password = passwordEncoder.encode(user.getPassword());
+        user.setPassword(password);
+        //添加进数据库
+        save(user);
+        return ResponseResult.okResult();
+    }
+
+    /**
+     * 判断数据库中是否有重复用户名
+     * @param userName
+     * @return
+     */
+    private boolean userNameExist(String userName) {
+        LambdaQueryWrapper<User> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(User::getUserName,userName);
+        return count(queryWrapper)>0;
+    }
+
+    /**
+     * 判断数据库中是否有重复别名
+     * @param nickName
+     * @return
+     */
+    private boolean nickNameExist(String nickName) {
+        LambdaQueryWrapper<User> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(User::getNickName,nickName);
+        return count(queryWrapper)>0;
+    }
+
+    /**
+     * 判断数据库中是否有重复邮箱
+     * @param email
+     * @return
+     */
+    private boolean emailExist(String email) {
+        LambdaQueryWrapper<User> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(User::getEmail,email);
+        return count(queryWrapper)>0;
     }
 }

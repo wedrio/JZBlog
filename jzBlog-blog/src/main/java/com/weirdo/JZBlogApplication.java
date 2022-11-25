@@ -5,6 +5,8 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.properties.ConfigurationPropertiesScan;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.scheduling.annotation.EnableScheduling;
+import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
 /**
  * @Author: xiaoli
@@ -14,6 +16,8 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 @SpringBootApplication
 @ConfigurationPropertiesScan
 @MapperScan("com.weirdo.mapper")
+@EnableScheduling
+@EnableSwagger2
 public class JZBlogApplication {
     public static void main(String[] args) {
         SpringApplication.run(JZBlogApplication.class,args);
