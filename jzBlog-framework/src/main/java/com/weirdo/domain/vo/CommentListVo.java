@@ -18,7 +18,6 @@ import java.util.List;
 @NoArgsConstructor
 public class CommentListVo {
     private Long id;
-
     //文章id
     private Long articleId;
     //根评论id

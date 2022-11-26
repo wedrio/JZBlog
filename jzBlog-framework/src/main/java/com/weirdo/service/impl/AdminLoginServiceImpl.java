@@ -1,15 +1,20 @@
 package com.weirdo.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.weirdo.constants.SystemConstants;
 import com.weirdo.domain.ResponseResult;
 import com.weirdo.domain.entity.LoginUser;
+import com.weirdo.domain.entity.Menu;
 import com.weirdo.domain.entity.User;
-import com.weirdo.domain.vo.LoginUserVo;
-import com.weirdo.domain.vo.UserInfoVo;
+import com.weirdo.domain.vo.*;
 import com.weirdo.enums.AppHttpCodeEnum;
 import com.weirdo.exception.SystemException;
 import com.weirdo.mapper.UserMapper;
+import com.weirdo.service.AdminLoginService;
+import com.weirdo.service.MenuService;
+import com.weirdo.service.RoleService;
 import com.weirdo.service.UserService;
 import com.weirdo.utils.BeanCopyUtils;
 import com.weirdo.utils.JwtUtil;
@@ -24,15 +29,16 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
-import java.util.Objects;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * @Author: xiaoli
  * @Date: 2022/11/20 --11:02
  * @Description:
  */
-@Service("userService")
-public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements UserService {
+@Service("adminLoginService")
+public class AdminLoginServiceImpl extends ServiceImpl<UserMapper, User> implements AdminLoginService {
 
     @Autowired
     private AuthenticationManager authenticationManager;
@@ -42,6 +48,12 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
 
     @Autowired
     private RedisCache redisCache;
+
+    @Autowired
+    private MenuService menuService;
+    @Autowired
+    private RoleService roleService;
+
 
     @Override
     public ResponseResult login(User user) {
@@ -59,21 +71,19 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         String s = loginUser.getUser().getId().toString();
         String jwt = JwtUtil.createJWT(s);
         //存入redis
-        redisCache.setCacheObject("login:" + s,loginUser);
+        redisCache.setCacheObject("adminLogin:" + s,loginUser);
 
         //返回前端所需响应格式
-        UserInfoVo userInfoVo = BeanCopyUtils.copyBean(loginUser.getUser(), UserInfoVo.class);
-        LoginUserVo loginUserVo = new LoginUserVo(jwt, userInfoVo);
-        return ResponseResult.okResult(loginUserVo);
+        Map<String,String> map = new HashMap<>();
+        map.put("token",jwt);
+        return ResponseResult.okResult(map);
     }
 
     @Override
     public ResponseResult logout() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        LoginUser loginUser = (LoginUser) authentication.getPrincipal();
-        String userid = loginUser.getUser().getId().toString();
+        Long userId = SecurityUtils.getUserId();
         //去redis中删除key
-        redisCache.deleteObject("login:" + userid);
+        redisCache.deleteObject("adminLogin:" + userId);
         return ResponseResult.okResult();
     }
 
@@ -125,6 +135,48 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         //添加进数据库
         save(user);
         return ResponseResult.okResult();
+    }
+
+    @Override
+    public ResponseResult getInfo() {
+        List<String> permissions = null;
+        List<String> roles = new ArrayList<>();
+        //获取登录的用户信息
+        LoginUser loginUser = SecurityUtils.getLoginUser();
+        //如果用户id为1，说明是管理员
+        if (loginUser.getUser().getId()==1L){
+            LambdaQueryWrapper<Menu> queryWrapper = new LambdaQueryWrapper<>();
+            queryWrapper.in(Menu::getMenuType, SystemConstants.MENU,SystemConstants.BUTTON);
+            queryWrapper.eq(Menu::getStatus,SystemConstants.STATUS_NORMAL);
+            List<Menu> list = menuService.list(queryWrapper);
+            //是管理员返回全部权限
+            permissions = list.stream().map(Menu::getPerms).collect(Collectors.toList());
+            //管理员返回角色为admin
+            roles.add("admin");
+        }else {
+            //根据用户id查询权限信息
+            permissions = menuService.queryPermsByUserId(loginUser.getUser().getId());
+            //TODO 根据用户id查询角色信息
+            roles = roleService.queryRoleByUserId(loginUser.getUser().getId());
+        }
+
+
+        UserInfoVo userInfoVo = BeanCopyUtils.copyBean(loginUser.getUser(), UserInfoVo.class);
+        AdminUserInfoVo adminUserInfoVo = new AdminUserInfoVo(permissions,roles,userInfoVo);
+        return ResponseResult.okResult(adminUserInfoVo);
+    }
+
+    @Override
+    public ResponseResult getRouters() {
+        List<MenuVo> menus = null;
+        //如果是管理员
+        if (SecurityUtils.isAdmin()){
+            //是 获取所有符合的menu
+            menus = menuService.selectAllRouterMenu();
+        }else {
+            menus = menuService.selectAllRouterMenuByUserId();
+        }
+        return ResponseResult.okResult(new RoutersVo(menus));
     }
 
     /**

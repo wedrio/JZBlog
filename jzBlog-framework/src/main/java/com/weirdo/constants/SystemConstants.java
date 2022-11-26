@@ -37,4 +37,16 @@ public class SystemConstants {
      * 评论类型：友链评论
      */
     public static final String LINK_COMMENT = "1";
+    /**
+     * 菜单类型：目录
+     */
+    public static final String CATALOGUE = "M";
+    /**
+     * 菜单类型：菜单
+     */
+    public static final String MENU = "C";
+    /**
+     * 菜单类型：按钮
+     */
+    public static final String BUTTON = "F";
 }

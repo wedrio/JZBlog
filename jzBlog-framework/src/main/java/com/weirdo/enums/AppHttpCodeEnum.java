@@ -17,6 +17,7 @@ public enum AppHttpCodeEnum {
     REQUIRE_USERNAME(504,"必须填写用户名"),
     REQUIRE_PASSWORD(504,"必须填写密码"),
     REQUIRE_NICKNAME(504,"必须填写别名"),
+    REQUIRE_TAG_NAME(504,"必须填写标签名"),
     REQUIRE_EMAIL(504,"必须填写邮箱"),
     LOGIN_ERROR(505,"用户名或密码错误"),
     COMMENT_NOT_NULL(506,"评论内容不能为空"),

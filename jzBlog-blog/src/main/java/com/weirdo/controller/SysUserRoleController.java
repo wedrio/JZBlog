@@ -2,7 +2,6 @@ package com.weirdo.controller;
 
 
 
-import com.weirdo.service.SysUserRoleService;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;

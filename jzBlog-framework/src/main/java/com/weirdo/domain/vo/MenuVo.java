@@ -1,25 +1,25 @@
-package com.weirdo.domain.entity;
+package com.weirdo.domain.vo;
 
-import java.util.Date;
-import java.io.Serializable;
-
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableName;
+import com.weirdo.domain.entity.Menu;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
 /**
- * 菜单权限表(SysMenu)表实体类
- *
- * @author makejava
- * @since 2022-11-05 15:56:04
+ * @Author: xiaoli
+ * @Date: 2022/11/26 --13:05
+ * @Description:
  */
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@TableName("sys_menu")
-public class SysMenu{
+public class MenuVo {
     //菜单ID
     @TableId
     private Long id;
@@ -33,8 +33,6 @@ public class SysMenu{
     private String path;
     //组件路径
     private String component;
-    //是否为外链（0是 1否）
-    private Integer isFrame;
     //菜单类型（M目录 C菜单 F按钮）
     private String menuType;
     //菜单状态（0显示 1隐藏）
@@ -45,18 +43,10 @@ public class SysMenu{
     private String perms;
     //菜单图标
     private String icon;
-    //创建者
-    private Long createBy;
     //创建时间
     private Date createTime;
-    //更新者
-    private Long updateBy;
-    //更新时间
-    private Date updateTime;
-    //备注
-    private String remark;
-    
-    private String delFlag;
 
+
+    @TableField(exist = false)//该字段在表中不存在
+    private List<MenuVo> children = new ArrayList<>();
 }
-

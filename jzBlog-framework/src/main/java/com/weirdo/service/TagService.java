@@ -1,6 +1,8 @@
 package com.weirdo.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.weirdo.domain.ResponseResult;
+import com.weirdo.domain.dto.TagListDto;
 import com.weirdo.domain.entity.Tag;
 
 /**
@@ -11,5 +13,10 @@ import com.weirdo.domain.entity.Tag;
  */
 public interface TagService extends IService<Tag> {
 
+    ResponseResult pageTagList(Integer pageNum, Integer pageSize, TagListDto tagListDto);
+
+    ResponseResult addTag(TagListDto tagListDto);
+
+    ResponseResult delTag(Long id);
 }
 

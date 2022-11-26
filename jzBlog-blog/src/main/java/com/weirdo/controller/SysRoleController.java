@@ -1,7 +1,7 @@
 package com.weirdo.controller;
 
 
-import com.weirdo.service.SysRoleService;
+import com.weirdo.service.RoleService;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
@@ -20,7 +20,7 @@ public class SysRoleController  {
      * 服务对象
      */
     @Resource
-    private SysRoleService sysRoleService;
+    private RoleService roleService;
 
 
 }

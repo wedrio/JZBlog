@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.weirdo.mapper.MenuMapper">
+    <select id="queryPermsByUserId" resultType="java.lang.String">
+        select
+            DISTINCT perms
+        from
+            sys_user_role sur left join sys_role_menu srm on sur.role_id = srm.role_id left outer join sys_menu sm on srm.menu_id = sm.id
+        where
+            sur.user_id = #{userId} and
+            sm.menu_type in ('C','F') and
+            sm.status = 0 and
+            sm.del_flag = 0;
+    </select>
+    <select id="selectAllRootRouterMenu" resultType="com.weirdo.domain.vo.MenuVo">
+        select
+               id,component,create_time,icon,menu_name,menu_type,order_num,parent_id,path,ifnull(perms,''),status,visible
+        from
+             sys_menu
+        where
+              parent_id = 0
+          and del_flag = 0
+          and status = 0
+          and menu_type in ('M','C');
+    </select>
+    <select id="selectAllRouterMenuByUserId" resultType="com.weirdo.domain.vo.MenuVo">
+        select
+            DISTINCT sm.id,sm.component,sm.create_time,sm.icon,sm.menu_name,sm.menu_type,sm.order_num,sm.parent_id,sm.path,IFNULL(sm.perms,''),sm.status,sm.visible
+        from
+            sys_user_role sur left join sys_role_menu srm on sur.role_id = srm.role_id left join sys_menu sm on srm.menu_id = sm.id
+        where
+          sur.user_id = #{userId}
+          and sm.status = 0
+          and sm.del_flag = 0
+          and sm.menu_type in ('M','C')
+          and sm.parent_id = 0;
+    </select>
+    <select id="queryAllByUserId" resultType="com.weirdo.domain.entity.Menu">
+        select
+            DISTINCT sm.id,sm.component,sm.create_time,sm.icon,sm.menu_name,sm.menu_type,sm.order_num,sm.parent_id,sm.path,IFNULL(sm.perms,''),sm.status,sm.visible
+        from
+            sys_user_role sur left join sys_role_menu srm on sur.role_id = srm.role_id left join sys_menu sm on srm.menu_id = sm.id
+        where
+            sur.user_id = #{arg0}
+          and sm.parent_id = #{arg1}
+          and sm.status = 0
+          and sm.del_flag = 0
+          and sm.menu_type in ('M','C');
+    </select>
+</mapper>
