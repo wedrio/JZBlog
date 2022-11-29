@@ -1,12 +1,14 @@
 package com.weirdo.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.weirdo.domain.ResponseResult;
-import com.weirdo.domain.dto.TagListDto;
+import com.weirdo.domain.dto.TagDto;
 import com.weirdo.domain.entity.User;
 import com.weirdo.domain.vo.PageVo;
+import com.weirdo.domain.vo.TagVo;
 import com.weirdo.enums.AppHttpCodeEnum;
 import com.weirdo.exception.SystemException;
 import com.weirdo.mapper.TagMapper;
@@ -29,34 +31,35 @@ import java.util.List;
 @Service("tagService")
 public class TagServiceImpl extends ServiceImpl<TagMapper, Tag> implements TagService {
 
+
     @Override
-    public ResponseResult pageTagList(Integer pageNum, Integer pageSize, TagListDto tagListDto) {
+    public ResponseResult pageTagList(Integer pageNum, Integer pageSize, TagDto tagDto) {
         LambdaQueryWrapper<Tag> queryWrapper = new LambdaQueryWrapper<>();
-        queryWrapper.eq(StringUtils.hasText(tagListDto.getName()),Tag::getName,tagListDto.getName());
-        queryWrapper.eq(StringUtils.hasText(tagListDto.getRemark()),Tag::getRemark,tagListDto.getRemark());
+        queryWrapper.eq(StringUtils.hasText(tagDto.getName()),Tag::getName, tagDto.getName());
+        queryWrapper.eq(StringUtils.hasText(tagDto.getRemark()),Tag::getRemark, tagDto.getRemark());
         Page<Tag> page = new Page<>(pageNum, pageSize);
         page(page, queryWrapper);
         List<Tag> tags = page.getRecords();
-        List<TagListDto> tagListDtos = BeanCopyUtils.copyBeanList(tags, TagListDto.class);
-        PageVo pageVo = new PageVo(tagListDtos, page.getTotal());
+        List<TagVo> tagVos = BeanCopyUtils.copyBeanList(tags, TagVo.class);
+        PageVo pageVo = new PageVo(tagVos, page.getTotal());
         return ResponseResult.okResult(pageVo);
     }
 
     @Override
-    public ResponseResult addTag(TagListDto tagListDto) {
-        if (!StringUtils.hasText(tagListDto.getName())){
+    public ResponseResult addTag(TagDto tagDto) {
+        if (!StringUtils.hasText(tagDto.getName())){
             throw new SystemException(AppHttpCodeEnum.REQUIRE_TAG_NAME);
         }
         User user = SecurityUtils.getLoginUser().getUser();
         Tag tag = new Tag();
-        tag.setName(tagListDto.getName());
-        tag.setRemark(tagListDto.getRemark());
+        tag.setName(tagDto.getName());
+        tag.setRemark(tagDto.getRemark());
         tag.setCreateBy(user.getId());
         tag.setCreateTime(new Date());
         tag.setUpdateBy(user.getId());
         tag.setUpdateTime(new Date());
-        if (!StringUtils.hasText(tagListDto.getRemark())){
-            tag.setRemark(tagListDto.getRemark());
+        if (!StringUtils.hasText(tagDto.getRemark())){
+            tag.setRemark(tagDto.getRemark());
         }
         save(tag);
         return ResponseResult.okResult();
@@ -64,8 +67,40 @@ public class TagServiceImpl extends ServiceImpl<TagMapper, Tag> implements TagSe
 
     @Override
     public ResponseResult delTag(Long id) {
-        removeById(id);
+        TagMapper mapper = getBaseMapper();
+        mapper.deleteById(id);
         return ResponseResult.okResult();
+    }
+
+    @Override
+    public ResponseResult updateTag(TagDto tagDto) {
+        if (!StringUtils.hasText(tagDto.getName())){
+            throw new SystemException(AppHttpCodeEnum.REQUIRE_TAG_NAME);
+        }
+        User user = SecurityUtils.getLoginUser().getUser();
+        LambdaUpdateWrapper<Tag> updateWrapper = new LambdaUpdateWrapper<>();
+        updateWrapper.eq(Tag::getId,tagDto.getId());
+        updateWrapper.set(Tag::getUpdateBy,user.getId());
+        updateWrapper.set(Tag::getUpdateTime,new Date());
+        Tag tag = BeanCopyUtils.copyBean(tagDto, Tag.class);
+        update(tag,updateWrapper);
+        return ResponseResult.okResult();
+    }
+
+    @Override
+    public ResponseResult getTag(Long id) {
+        LambdaQueryWrapper<Tag> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(Tag::getId,id);
+        Tag tag = getOne(queryWrapper);
+        TagVo tagVo = BeanCopyUtils.copyBean(tag, TagVo.class);
+        return ResponseResult.okResult(tagVo);
+    }
+
+    @Override
+    public ResponseResult listAllTag() {
+        List<Tag> tags = list();
+        List<TagVo> tagVos = BeanCopyUtils.copyBeanList(tags, TagVo.class);
+        return ResponseResult.okResult(tagVos);
     }
 }
 

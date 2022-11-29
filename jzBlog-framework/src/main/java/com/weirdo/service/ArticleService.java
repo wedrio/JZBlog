@@ -3,6 +3,8 @@ package com.weirdo.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.weirdo.domain.ResponseResult;
+import com.weirdo.domain.dto.UpdateArticleDto;
+import com.weirdo.domain.dto.ArticleListDto;
 import com.weirdo.domain.entity.Article;
 
 /**
@@ -20,5 +22,15 @@ public interface ArticleService extends IService<Article> {
     ResponseResult getArticleDetail(Long articleId);
 
     ResponseResult updateViewCount(Long articleId);
+
+    ResponseResult add(UpdateArticleDto updateArticleDto);
+
+    ResponseResult articlePageList(Integer pageNum, Integer pageSize, ArticleListDto articleListDto);
+
+    ResponseResult selectArticleById(Long id);
+
+    ResponseResult updateArticleById(UpdateArticleDto updateArticleDto);
+
+    ResponseResult deleteArticleById(Long id);
 }
 

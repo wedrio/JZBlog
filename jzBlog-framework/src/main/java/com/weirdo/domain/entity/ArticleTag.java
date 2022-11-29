@@ -20,7 +20,6 @@ import lombok.NoArgsConstructor;
 @TableName("sg_article_tag")
 public class ArticleTag{
     //文章id
-    @TableId
     private Long articleId;
     //标签id
     private Long tagId;

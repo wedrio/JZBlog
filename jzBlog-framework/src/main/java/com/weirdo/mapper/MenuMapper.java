@@ -2,6 +2,7 @@ package com.weirdo.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.weirdo.domain.entity.Menu;
+import com.weirdo.domain.vo.MenuTreeVo;
 import com.weirdo.domain.vo.MenuVo;
 import org.apache.ibatis.annotations.Mapper;
 
@@ -23,5 +24,9 @@ public interface MenuMapper extends BaseMapper<Menu> {
     List<MenuVo> selectAllRouterMenuByUserId(Long userId);
 
     List<Menu> queryAllByUserId(Long userId,Long id);
+
+    List<MenuTreeVo> selectAllRootMenu();
+
+    List<MenuTreeVo> queryList(Long id);
 }
 

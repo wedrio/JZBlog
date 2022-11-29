@@ -49,4 +49,9 @@ public class SystemConstants {
      * 菜单类型：按钮
      */
     public static final String BUTTON = "F";
+
+    /**
+     * 用户类型：管理员
+     */
+    public static final String ADMIN = "1";
 }

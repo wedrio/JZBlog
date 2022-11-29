@@ -14,12 +14,6 @@ public interface AdminLoginService extends IService<User> {
 
     ResponseResult logout();
 
-    ResponseResult userInfo();
-
-    ResponseResult updateUserInfo(User user);
-
-    ResponseResult register(User user);
-
     ResponseResult getInfo();
 
     ResponseResult getRouters();

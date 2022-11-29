@@ -1,21 +1,22 @@
-package com.weirdo.domain.dto;
+package com.weirdo.domain.vo;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-
+import java.util.List;
 
 /**
  * @Author: xiaoli
- * @Date: 2022/11/26 --21:32
+ * @Date: 2022/11/27 --22:02
  * @Description:
  */
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class TagListDto {
+public class MenuTreeVo {
     private Long id;
-    private String name;
-    private String remark;
+    private String label;
+    private Long parentId;
+    private List<MenuTreeVo> children;
 }

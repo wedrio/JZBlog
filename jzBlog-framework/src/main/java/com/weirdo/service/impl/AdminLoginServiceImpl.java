@@ -88,56 +88,6 @@ public class AdminLoginServiceImpl extends ServiceImpl<UserMapper, User> impleme
     }
 
     @Override
-    public ResponseResult userInfo() {
-        //获取当前用户id
-        Long userId = SecurityUtils.getUserId();
-        //根据用户id查询用户信息
-        User user = getById(userId);
-        //封装成userInfoVo
-        UserInfoVo vo = BeanCopyUtils.copyBean(user, UserInfoVo.class);
-        return ResponseResult.okResult(vo);
-    }
-
-    @Override
-    public ResponseResult updateUserInfo(User user) {
-        updateById(user);
-        return ResponseResult.okResult();
-    }
-
-    @Override
-    public ResponseResult register(User user) {
-        //对数据进行校验
-        if (!StringUtils.hasText(user.getUserName())){
-            throw new SystemException(AppHttpCodeEnum.REQUIRE_USERNAME);
-        }
-        if (!StringUtils.hasText(user.getPassword())){
-            throw new SystemException(AppHttpCodeEnum.REQUIRE_PASSWORD);
-        }
-        if (!StringUtils.hasText(user.getNickName())){
-            throw new SystemException(AppHttpCodeEnum.REQUIRE_NICKNAME);
-        }
-        if (!StringUtils.hasText(user.getEmail())){
-            throw new SystemException(AppHttpCodeEnum.REQUIRE_EMAIL);
-        }
-        //排查数据是否在数据库中有重复
-        if (userNameExist(user.getUserName())){
-            throw new SystemException(AppHttpCodeEnum.USERNAME_EXIST);
-        }
-        if (nickNameExist(user.getNickName())){
-            throw new SystemException(AppHttpCodeEnum.NICKNAME_EXIST);
-        }
-        if (emailExist(user.getEmail())){
-            throw new SystemException(AppHttpCodeEnum.EMAIL_EXIST);
-        }
-        //对密码进行加密
-        String password = passwordEncoder.encode(user.getPassword());
-        user.setPassword(password);
-        //添加进数据库
-        save(user);
-        return ResponseResult.okResult();
-    }
-
-    @Override
     public ResponseResult getInfo() {
         List<String> permissions = null;
         List<String> roles = new ArrayList<>();

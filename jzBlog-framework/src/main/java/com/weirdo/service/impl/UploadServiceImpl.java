@@ -80,6 +80,7 @@ public class UploadServiceImpl implements UploadService {
             }
         } catch (Exception ex) {
             //ignore
+            throw new RuntimeException("文件传出错");
         }
         return "http://rlsty6d9f.bkt.clouddn.com/" + key;
     }

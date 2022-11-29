@@ -21,7 +21,8 @@
               parent_id = 0
           and del_flag = 0
           and status = 0
-          and menu_type in ('M','C');
+          and menu_type in ('M','C')
+        order by order_num;
     </select>
     <select id="selectAllRouterMenuByUserId" resultType="com.weirdo.domain.vo.MenuVo">
         select
@@ -33,7 +34,8 @@
           and sm.status = 0
           and sm.del_flag = 0
           and sm.menu_type in ('M','C')
-          and sm.parent_id = 0;
+          and sm.parent_id = 0
+          order by sm.order_num;
     </select>
     <select id="queryAllByUserId" resultType="com.weirdo.domain.entity.Menu">
         select
@@ -45,6 +47,28 @@
           and sm.parent_id = #{arg1}
           and sm.status = 0
           and sm.del_flag = 0
-          and sm.menu_type in ('M','C');
+          and sm.menu_type in ('M','C')
+          order by sm.order_num;
+    </select>
+    <select id="selectAllRootMenu" resultType="com.weirdo.domain.vo.MenuTreeVo">
+        select
+            id,menu_name as label,parent_id
+        from
+            sys_menu
+        where
+            del_flag = 0
+        and status = 0
+        and parent_id = 0
+    </select>
+    <select id="queryList" resultType="com.weirdo.domain.vo.MenuTreeVo">
+        select
+            id,menu_name as label,parent_id
+        from
+            sys_menu
+        where
+            del_flag = 0
+          and status = 0
+          and menu_type in ('M','C')
+          and parent_id = #{id}
     </select>
 </mapper>

@@ -1,9 +1,12 @@
 package com.weirdo.controller;
 
 import com.weirdo.domain.ResponseResult;
+import com.weirdo.enums.AppHttpCodeEnum;
+import com.weirdo.exception.SystemException;
 import com.weirdo.service.UploadService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -18,7 +21,11 @@ public class UploadController {
     private UploadService uploadService;
 
     @PostMapping("/upload")
-    public ResponseResult uploadImg(MultipartFile img){
-        return uploadService.uploadImg(img);
+    public ResponseResult uploadImg(@RequestParam("img") MultipartFile img){
+        try{
+            return uploadService.uploadImg(img);
+        }catch (Exception e){
+            throw new RuntimeException("文件上传失败");
+        }
     }
 }

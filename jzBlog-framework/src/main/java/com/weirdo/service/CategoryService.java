@@ -2,6 +2,8 @@ package com.weirdo.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.weirdo.domain.ResponseResult;
+import com.weirdo.domain.dto.AddCategoryDto;
+import com.weirdo.domain.dto.UpdateCategoryDto;
 import com.weirdo.domain.entity.Category;
 
 /**
@@ -13,5 +15,15 @@ import com.weirdo.domain.entity.Category;
 public interface CategoryService extends IService<Category> {
 
     ResponseResult getCategoryList();
+
+    ResponseResult selectAllPageCategory(Integer pageNum, Integer pageSize, String name, String status);
+
+    ResponseResult addCategory(AddCategoryDto addCategoryDto);
+
+    ResponseResult selectCategoryById(Long id);
+
+    ResponseResult updateCategory(UpdateCategoryDto updateCategoryDto);
+
+    ResponseResult deleteCategory(Long id);
 }
 

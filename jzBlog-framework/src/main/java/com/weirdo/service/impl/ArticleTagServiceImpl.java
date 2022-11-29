@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.weirdo.mapper.ArticleTagMapper;
 import com.weirdo.domain.entity.ArticleTag;
 import com.weirdo.service.ArticleTagService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 /**
@@ -14,6 +15,5 @@ import org.springframework.stereotype.Service;
  */
 @Service("articleTagService")
 public class ArticleTagServiceImpl extends ServiceImpl<ArticleTagMapper, ArticleTag> implements ArticleTagService {
-
 }
 
